@@ -32,8 +32,14 @@ A RESTful API service built using Flask to fetch real-time stock quotes. This se
 
 ### Steps
 
-1. Clone the repository
-2. Navigate to the project directory
+1. Clone the repository:
+   ```bash
+   git@github.com:zejj42/stock-quote-api.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd stock-quote-api
+   ```
 3. Start the Docker containers:
    ```bash
    docker-compose up
@@ -45,6 +51,12 @@ To fetch a stock quote:
 
 ```bash
 curl -X GET http://localhost:5001/quote/AAPL
+```
+
+To check the cost counter (Admin only):
+
+```bash
+curl -X GET http://localhost:5001/cost -H "x-api-key: k78a0snbf8JHm"
 ```
 
 To reset cost counter (Admin only):
