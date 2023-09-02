@@ -80,6 +80,42 @@ The `/cost` and `/reset_cost` endpoints require an admin API key to be included 
 
 The service employs a dynamic cache strategy using Redis to store stock data. The cache expiration time is determined by the stock's volatility.
 
+## Switching Between Different Branches with Docker
+
+To switch between different branches of the repository and run the application using Docker, the following steps ensure a seamless transition:
+
+### Steps
+
+1. Switch to the desired Git branch:
+
+   ```bash
+   git checkout <branch_name>
+   ```
+
+2. Stop all running containers, rebuild Docker images, and start the services:
+
+   ```bash
+   docker-compose down && docker-compose build && docker-compose up
+   ```
+
+   **Note**: Executing these commands will reset any existing cache.
+
+## Cache Strategy
+
+The service employs a dynamic cache strategy using Redis to store stock data. The cache expiration time is determined by the stock's volatility and trading hours, thereby minimizing unnecessary API calls while ensuring updated stock information.
+
+## Cache Interface (`cache_interface`)
+
+The cache interface abstracts the caching mechanism, facilitating the integration of different caching backends such as Redis or in-memory solutions without altering the core application code.
+
+## Stock API Interface (`stock_api`)
+
+The stock API interface offers an abstraction for stock data retrieval, allowing for the utilization of various stock API providers without significant code modifications. Configuration updates are all that is required to switch between API providers.
+
+## Type Hinting
+
+Python's type hinting features are extensively used throughout the codebase to enhance code readability, enable better development-time error checking, and simplify debugging.
+
 ## Rate Limiting (Only in `rate-limited` branch)
 
 In addition to the main features, the `rate-limited` branch includes functionality to limit the number of API requests based on the source IP. This is to ensure that the API is not overused.
