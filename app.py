@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from functools import wraps
 import requests
 import redis
 import json
@@ -16,9 +17,6 @@ app = Flask(__name__)
 cache = redis.StrictRedis(host="redis", port=6379, db=0)
 
 cost_counter = 0
-
-from functools import wraps
-
 
 def requires_auth(f):
     @wraps(f)
