@@ -1,6 +1,7 @@
-from flask import jsonify, request
+from datetime import datetime
+from flask import jsonify, request, Response
 from functools import wraps
-import json
+from cache_interface import CacheInterface
 from configurations import Config
 from constants import *
 from errors import UNAUTHORIZED
@@ -15,7 +16,7 @@ def requires_auth(f):
 
     return decorated
 
-def get_cache_duration(current_time, high_low_ratio):
+def get_cache_duration(current_time: datetime, high_low_ratio: float) -> int:
     """
     Calculate the cache duration based on trading hours and volatility.
 
@@ -36,31 +37,18 @@ def get_cache_duration(current_time, high_low_ratio):
         return CACHE_DURATION_NON_TRADING
 
 
-def build_error(error_string, error_code=500):
+def build_error(error_string: str, error_code: int = 500) -> Response:
     return jsonify({"error": error_string}), error_code
 
-def increment_cost_counter(cache):
-    current_cost = get_float_from_cache(cache, "cost_counter")
+def increment_cost_counter(cache: CacheInterface):
+    current_cost = cache.get(COST_COUNTER) or 0.0
     new_cost = current_cost + QUERY_COST
-    cache.set("cost_counter", str(new_cost))
+    cache.set(COST_COUNTER, new_cost)
 
-def update_cache(cache, symbol, stock_data, current_time):
+def update_cache(cache: CacheInterface, symbol: str, stock_data: dict, current_time: datetime):
     increment_cost_counter(cache)
-    high_low_ratio = stock_data.get("high_low_ratio")
-    stock_quote_data = stock_data.get("stock_quote_data")
+    high_low_ratio = stock_data.get(HIGH_LOW_RATIO)
+    stock_quote_data = stock_data.get(STOCK_QUOTE_DATA)
     cache_time = get_cache_duration(current_time, high_low_ratio)
-    cache.setex(symbol, cache_time, json.dumps(stock_quote_data))
-
-
-
-def get_float_from_cache(cache, key):
-    """Retrieve a floating-point value from Redis cache.
-
-    Args:
-        cache: Redis cache instance.
-        key (str): Key to retrieve from cache.
-
-    Returns:
-        float: Floating-point value of the key in cache.
-    """
-    return float(cache.get(key).decode("utf-8"))
+    cache.set_with_expiry(symbol, stock_quote_data, cache_time)
+    

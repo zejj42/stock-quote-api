@@ -1,3 +1,17 @@
+COST_COUNTER_RESET_VALUE = 0
+
+ALPHA_VANTAGE = 'AlphaVantage'
+REDIS = 'redis'
+
+STOCK_QUOTE_DATA = "stock_quote_data"
+COST_COUNTER = "cost_counter"
+
+SYMBOL = "symbol"
+UPDATE_TIME = "update_time"
+PRICE = "price"
+CHANGE_PERCENT = "change_percent"
+HIGH_LOW_RATIO = "high_low_ratio"
+
 TRADING_HOUR_START = 10
 TRADING_HOUR_END = 17
 CACHE_DURATION_HIGH_VOLATILITY = 10 * 60  # 10 minutes

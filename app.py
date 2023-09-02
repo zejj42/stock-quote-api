@@ -1,24 +1,27 @@
 from flask import Flask, jsonify
 from flask_limiter.util import get_remote_address
 from flask_limiter import Limiter
-import redis
-import json
 import datetime
+from cache_interface import CacheFactory
 from configurations import Config
 from stock_api import StockAPIFactory
 from errors import SYMBOL_NOT_FOUND, FETCH_STOCK_DATA_FAILED
-from utils import build_error, get_float_from_cache, requires_auth, update_cache
+from utils import build_error, requires_auth, update_cache
+from constants import *
+
 
 API_NAME = Config.API_NAME 
-ADMIN_API_KEY = Config.ADMIN_API_KEY
 api_client = StockAPIFactory.create(API_NAME)
 
+CACHE_NAME = Config.CACHE_NAME
+cache = CacheFactory.create(CACHE_NAME)
+
 app = Flask(__name__)
-cache = redis.StrictRedis(host=Config.CACHE_HOST, port=Config.CACHE_PORT, db=Config.CACHE_DB)
+
 limiter = Limiter(app, key_func=get_remote_address, default_limits=["10 per minute"])
 
-if not cache.exists("cost_counter"):
-    cache.set("cost_counter", 0)
+if not cache.exists(COST_COUNTER):
+    cache.set(COST_COUNTER, COST_COUNTER_RESET_VALUE)
 
 @app.route("/quote/<symbol>", methods=["GET"])
 @limiter.limit("10/minute")
@@ -27,7 +30,7 @@ def get_quote(symbol):
     cached_data = cache.get(symbol)
 
     if cached_data:
-        return jsonify(json.loads(cached_data))
+        return jsonify(cached_data)
     
     current_time = datetime.datetime.now()
     stock_data = api_client.get_stock_quote(symbol, current_time)
@@ -39,20 +42,20 @@ def get_quote(symbol):
 
     
     update_cache(cache, symbol, stock_data, current_time)
-    return jsonify(stock_data.get("stock_quote_data"))
+    return jsonify(stock_data.get(STOCK_QUOTE_DATA))
 
 
 @app.route("/cost", methods=["GET"])
 @requires_auth
 def get_cost():
-    cost_counter = get_float_from_cache(cache, "cost_counter")
+    cost_counter = cache.get(COST_COUNTER) or COST_COUNTER_RESET_VALUE
     return jsonify({"total_cost": cost_counter})
 
 
 @app.route("/reset_cost", methods=["POST"])
 @requires_auth
 def reset_cost():
-    cache.set("cost_counter", 0)
+    cache.set(COST_COUNTER, COST_COUNTER_RESET_VALUE)
     return jsonify({"status": "Cost counter reset"})
 
 
