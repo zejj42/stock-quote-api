@@ -1,4 +1,7 @@
 from flask import Flask, request, jsonify
+from functools import wraps
+from flask_limiter.util import get_remote_address
+from flask_limiter import Limiter
 import requests
 import redis
 import json
@@ -14,10 +17,9 @@ ALPHAVANTAGE_API_KEY = "3E11545CAV72Q0C2"
 
 app = Flask(__name__)
 cache = redis.StrictRedis(host="redis", port=6379, db=0)
+limiter = Limiter(app, key_func=get_remote_address, default_limits=["10 per minute"])
 
 cost_counter = 0
-
-from functools import wraps
 
 
 def requires_auth(f):
@@ -48,6 +50,7 @@ def get_stock_quote(symbol):
 
 
 @app.route("/quote/<symbol>", methods=["GET"])
+@limiter.limit("10/minute")
 def get_quote(symbol):
     global cost_counter
     symbol = symbol.upper()
