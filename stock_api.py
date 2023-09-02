@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from configurations import Config
 import requests
-
+from configurations import Config
+from constants import *
 from errors import SYMBOL_NOT_FOUND
 
 class StockAPIInterface(ABC):
@@ -41,19 +41,22 @@ class AlphaVantageAPI(StockAPIInterface):
 
     def extract_stock_data(self, data, current_time):
         stock_quote_data = {
-            "symbol": data["01. symbol"],
-            "update_time": current_time.strftime("%Y-%m-%d %H:%M:%S"),
-            "price": data["05. price"],
-            "change_percent": data["10. change percent"],
+            SYMBOL: data["01. symbol"],
+            UPDATE_TIME: current_time.strftime("%Y-%m-%d %H:%M:%S"),
+            PRICE: data["05. price"],
+            CHANGE_PERCENT: data["10. change percent"],
         }
         high_low_ratio = float(data["03. high"]) / float(data["04. low"])
-        return { "stock_quote_data": stock_quote_data, "high_low_ratio": high_low_ratio }
+        return { STOCK_QUOTE_DATA: stock_quote_data, HIGH_LOW_RATIO: high_low_ratio }
 
 class StockAPIFactory:
-
+    
     @staticmethod
-    def create(api_name):
-        if api_name == Config.API_NAME:
-            return AlphaVantageAPI()
+    def create(api_name: str):
+        supported_apis = [ALPHA_VANTAGE]
+
+        if api_name in supported_apis:
+            if api_name == ALPHA_VANTAGE:
+                return AlphaVantageAPI()
         else:
             raise ValueError(f"API {api_name} not supported")
