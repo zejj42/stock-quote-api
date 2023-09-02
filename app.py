@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-from functools import wraps
 from flask_limiter.util import get_remote_address
 from flask_limiter import Limiter
 import redis
