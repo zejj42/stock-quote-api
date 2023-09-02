@@ -10,18 +10,15 @@ from utils import build_error, requires_auth, update_cache
 from constants import *
 
 
-API_NAME = Config.API_NAME 
-api_client = StockAPIFactory.create(API_NAME)
-
-CACHE_NAME = Config.CACHE_NAME
-cache = CacheFactory.create(CACHE_NAME)
-
+api_client = StockAPIFactory.create(Config.API_NAME)
+cache = CacheFactory.create(Config.CACHE_NAME)
 app = Flask(__name__)
 
 limiter = Limiter(app, key_func=get_remote_address, default_limits=["10 per minute"])
 
 if not cache.exists(COST_COUNTER):
     cache.set(COST_COUNTER, COST_COUNTER_RESET_VALUE)
+
 
 @app.route("/quote/<symbol>", methods=["GET"])
 @limiter.limit("10/minute")

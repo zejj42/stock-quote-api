@@ -2,7 +2,7 @@ class Config:
     ADMIN_API_KEY = "k78a0snbf8JHm"
     
     API_NAME = 'AlphaVantage'
-    ALPHAVANTAGE_API_KEY = "3E11545CAV72Q0C2"
+    ALPHAVANTAGE_API_KEY = "Y2R9RKOESRRHSO10"
     ALPHAVANTAGE_API_URL = "https://www.alphavantage.co/query"
     
     APP_HOST = "0.0.0.0"
