@@ -11,6 +11,7 @@ A RESTful API service built using Flask to fetch real-time stock quotes. This se
 - [Endpoints](#endpoints)
 - [Authentication](#authentication)
 - [Cache Strategy](#cache-strategy)
+- [Rate Limiting](#rate-limiting) (Only in `rate-limited` branch)
 
 ## Features
 
@@ -78,3 +79,15 @@ The `/cost` and `/reset_cost` endpoints require an admin API key to be included 
 ## Cache Strategy
 
 The service employs a dynamic cache strategy using Redis to store stock data. The cache expiration time is determined by the stock's volatility.
+
+## Rate Limiting (Only in `rate-limited` branch)
+
+In addition to the main features, the `rate-limited` branch includes functionality to limit the number of API requests based on the source IP. This is to ensure that the API is not overused.
+
+### Limitation Rules
+
+- Up to 10 requests per minute per IP for the `/quote/<symbol>` endpoint.
+
+### Handling Exceeding Limits
+
+If a specific IP source exceeds the limit, the service will return a `429 Too Many Requests` status code.
