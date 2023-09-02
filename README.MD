@@ -35,7 +35,7 @@ A RESTful API service built using Flask to fetch real-time stock quotes. This se
 
 1. Clone the repository:
    ```bash
-   git@github.com:zejj42/stock-quote-api.git
+   git clone git@github.com:zejj42/stock-quote-api.git
    ```
 2. Navigate to the project directory:
    ```bash
@@ -127,3 +127,7 @@ In addition to the main features, the `rate-limited` branch includes functionali
 ### Handling Exceeding Limits
 
 If a specific IP source exceeds the limit, the service will return a `429 Too Many Requests` status code.
+
+## Handling of Sensitive Information
+
+In this codebase, API keys and other confidential configurations are directly embedded within the `configurations.py` file. In a production-grade application, it's essential to store these sensitive pieces of information as environment variables or utilize a secure secret management service to prevent potential exposure.
